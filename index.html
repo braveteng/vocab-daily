@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>上海初一英语每日练</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111827;color:#e5e7eb;font-family:'Microsoft YaHei','Segoe UI',sans-serif;display:flex;justify-content:center;min-height:100vh}
+#root{width:100%;max-width:500px;padding:16px}
+h1{text-align:center;color:#fbbf24;font-size:20px;letter-spacing:4px;margin-bottom:4px}
+.sub{text-align:center;color:#6b7280;font-size:12px;margin-bottom:16px}
+.row{display:flex;gap:8px;margin-bottom:12px}
+.card{flex:1;background:#1f2937;border:1px solid #374151;border-radius:10px;padding:12px;text-align:center}
+.card .v{font-size:24px;font-weight:700;color:#fbbf24}
+.card .v.red{color:#ef4444}
+.card .v.grn{color:#22c55e}
+.card .lb{font-size:11px;color:#9ca3af;margin-top:2px}
+.pbar{height:8px;background:#1f2937;border-radius:4px;overflow:hidden;margin-bottom:4px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#fbbf24,#f97316);border-radius:4px;transition:width .3s}
+.plabel{font-size:11px;color:#6b7280;text-align:right;margin-bottom:14px}
+.dots{display:flex;justify-content:center;gap:5px;margin-bottom:14px}
+.dots span{width:22px;height:22px;border-radius:50%;background:#1f2937;border:1px solid #374151;display:flex;align-items:center;justify-content:center;font-size:9px;color:#6b7280}
+.dots span.ok{background:#14532d;border-color:#22c55e;color:#22c55e}
+.dots span.today{border-color:#fbbf24}
+.btn{display:inline-block;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;text-align:center}
+.btn:active{transform:scale(.96)}
+.btn-main{background:#fbbf24;color:#111;width:100%}
+.btn-main:hover{background:#f59e0b}
+.btn-main:disabled{background:#374151;color:#6b7280;cursor:not-allowed}
+.btn-ghost{background:#1f2937;color:#d1d5db;border:1px solid #374151;width:100%;margin-top:8px}
+.btn-ghost:hover{background:#374151}
+.wb{display:flex;align-items:center;gap:12px;padding:14px;background:#1f2937;border:1px solid #ef4444;border-radius:10px;cursor:pointer;margin:12px 0;transition:all .15s}
+.wb:hover{background:#2d1b1b}
+.wb:active{transform:scale(.98)}
+.wb .ico{font-size:26px}
+.wb .info{flex:1}
+.wb .title{font-size:14px;font-weight:700;color:#ef4444}
+.wb .desc{font-size:12px;color:#9ca3af;margin-top:2px}
+.wb .desc b{color:#ef4444}
+.wb .arr{font-size:20px;color:#ef4444}
+.wb.hide{display:none}
+.qhead{display:flex;justify-content:space-between;font-size:12px;color:#9ca3af;margin-bottom:6px}
+.qhead b{color:#fbbf24}
+.pmini{height:5px;background:#1f2937;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.pmini i{display:block;height:100%;background:#fbbf24;border-radius:3px;transition:width .3s}
+.tag{display:inline-block;font-size:11px;color:#9ca3af;background:#1f2937;padding:2px 10px;border-radius:8px;margin-bottom:10px}
+.qcenter{text-align:center;padding:10px 0}
+.qcenter .big{font-size:32px;font-weight:700;color:#fff;letter-spacing:1px}
+.qcenter .small{font-size:13px;color:#9ca3af;margin-top:4px}
+.speak{display:inline-block;margin-top:8px;padding:4px 14px;border-radius:12px;background:#1f2937;border:1px solid #374151;color:#9ca3af;font-size:12px;cursor:pointer;font-family:inherit}
+.speak:hover{background:#374151;color:#fbbf24}
+.ipa{display:inline-block;margin-top:4px;font-size:14px;color:#a78bfa;font-family:Consolas,'Lucida Sans Unicode',sans-serif;letter-spacing:.5px}
+.lets{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin:10px 0}
+.lets div{width:36px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:Consolas,monospace;background:#1f2937;border:2px solid #374151;border-radius:6px;color:#e5e7eb}
+.lets .bl{border:2px dashed #fbbf24;color:#fbbf24}
+.lets .ok{border-color:#22c55e;color:#22c55e}
+.lets .no{border-color:#ef4444;color:#ef4444}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts button{padding:12px;background:#1f2937;border:1px solid #374151;border-radius:8px;font-size:15px;color:#e5e7eb;cursor:pointer;font-family:inherit;text-align:left;transition:all .12s}
+.opts button:hover{background:#374151}
+.opts button.ok{background:#14532d;border-color:#22c55e;color:#22c55e}
+.opts button.no{background:#451a1a;border-color:#ef4444;color:#ef4444}
+.opts button.off{pointer-events:none;opacity:.6}
+.kb{margin-top:10px}
+.kb div{display:flex;justify-content:center;gap:3px;margin-bottom:3px}
+.kb button{width:30px;height:36px;border-radius:5px;border:1px solid #374151;background:#1f2937;color:#d1d5db;font-size:13px;font-weight:600;font-family:Consolas,monospace;cursor:pointer}
+.kb button:hover{background:#374151}
+.kb button:active{transform:scale(.88)}
+.kb button.used{opacity:.15;pointer-events:none}
+.fb{min-height:24px;text-align:center;font-size:13px;font-weight:600;margin:8px 0}
+.fb.ok{color:#22c55e}
+.fb.no{color:#ef4444}
+.tipbox{background:#1e1b4b;border:1px solid #fbbf24;border-radius:10px;padding:12px;margin-top:10px;text-align:center}
+.tipbox .tt{font-size:12px;color:#fbbf24;font-weight:700;margin-bottom:4px}
+.tipbox .td{font-size:13px;color:#e5e7eb;line-height:1.6}
+.rcard{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:24px;text-align:center}
+.rcard h2{font-size:20px;color:#fbbf24;margin-bottom:4px}
+.rcard .big{font-size:44px;font-weight:800;color:#fff;margin:8px 0}
+.rcard .big span{color:#6b7280;font-size:22px}
+.rcard .det{font-size:12px;color:#9ca3af;margin-bottom:14px}
+.wlist{text-align:left;margin:10px 0;padding:8px;background:#111827;border-radius:6px;font-size:12px;max-height:150px;overflow-y:auto}
+.wlist div{padding:3px 0;border-bottom:1px solid #1f2937}
+.wlist b{color:#fbbf24}.wlist em{color:#9ca3af;font-style:normal}
+.rcard button{padding:10px 24px;border:1px solid #374151;border-radius:8px;background:transparent;color:#fbbf24;font-size:13px;cursor:pointer;font-family:inherit;margin:4px}
+.rcard button:hover{background:#fbbf24;color:#111}
+.revlist{max-height:55vh;overflow-y:auto}
+.revlist div{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid #1f2937;font-size:13px}
+.revlist .en{color:#e5e7eb;font-weight:600}.revlist .cn{color:#9ca3af}.revlist .x{color:#ef4444;font-size:11px}
+.empty{text-align:center;color:#6b7280;padding:30px;font-size:13px}
+.revbtns{display:flex;gap:8px;margin-top:14px;justify-content:center}
+.revbtns button{padding:8px 18px;border:1px solid #374151;border-radius:7px;background:transparent;color:#d1d5db;font-size:12px;cursor:pointer;font-family:inherit}
+.revbtns button:hover{background:#374151}
+.revbtns .back{color:#fbbf24;border-color:#fbbf24}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0}
+.calgrid div{height:30px;border-radius:5px;background:#111827;display:flex;align-items:center;justify-content:center;font-size:11px;color:#6b7280}
+.calgrid div.h{background:none;color:#9ca3af;font-size:10px;font-weight:600}
+.calgrid div.done{background:#14532d;color:#22c55e;font-weight:600}
+.calgrid div.now{border:1px solid #fbbf24}
+.calgrid div.click{cursor:pointer;transition:all .15s}
+.calgrid div.click:hover{background:#374151;transform:scale(1.15);z-index:2;position:relative;box-shadow:0 0 8px rgba(251,191,36,.3)}
+.calcell{position:relative}
+.caltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1f2937;border:1px solid #fbbf24;border-radius:8px;padding:8px 12px;white-space:nowrap;z-index:10;font-size:11px;color:#e5e7eb;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.5);line-height:1.6}
+.caltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#fbbf24}
+.calcell:hover .caltip{display:block}
+.calmonth{display:flex;align-items:center;justify-content:center;gap:16px;margin:10px 0 4px}
+.calmonth button{background:#1f2937;border:1px solid #374151;color:#fbbf24;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.calmonth button:hover{background:#374151}
+.calmonth .mlabel{font-size:15px;font-weight:600;color:#fbbf24;min-width:100px;text-align:center}
+.calgrid div.part{background:#4a3800;color:#fbbf24}
+.calgrid div.today-cell{border:2px solid #fbbf24}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ======= 上海初一(牛津版)词库 =======
+var WORDS = [
+["one","一"],["two","二"],["three","三"],["four","四"],["five","五"],
+["six","六"],["seven","七"],["eight","八"],["nine","九"],["ten","十"],
+["hundred","百"],["thousand","千"],["first","第一"],["second","第二"],["third","第三"],
+["Monday","星期一"],["Tuesday","星期二"],["Wednesday","星期三"],["Thursday","星期四"],["Friday","星期五"],
+["Saturday","星期六"],["Sunday","星期日"],["January","一月"],["February","二月"],["March","三月"],
+["April","四月"],["May","五月"],["June","六月"],["July","七月"],["August","八月"],
+["September","九月"],["October","十月"],["November","十一月"],["December","十二月"],["spring","春天"],
+["summer","夏天"],["autumn","秋天"],["winter","冬天"],["morning","早上"],["afternoon","下午"],
+["evening","傍晚"],["tonight","今晚"],["yesterday","昨天"],["tomorrow","明天"],["week","星期"],
+["month","月份"],["year","年"],["hour","小时"],["minute","分钟"],["early","早的"],
+["late","晚的"],["parent","父/母亲"],["grandparent","祖父母"],["husband","丈夫"],["wife","妻子"],
+["uncle","叔叔"],["aunt","阿姨"],["cousin","表兄弟"],["neighbour","邻居"],["teenager","青少年"],
+["adult","成年人"],["family","家庭"],["head","头"],["eye","眼睛"],["ear","耳朵"],
+["nose","鼻子"],["mouth","嘴"],["face","脸"],["hair","头发"],["hand","手"],
+["arm","手臂"],["leg","腿"],["foot","脚"],["finger","手指"],["knee","膝盖"],
+["shoulder","肩膀"],["back","背"],["stomach","胃"],["tooth","牙齿"],["tall","高的"],
+["short","矮的"],["fat","胖的"],["thin","瘦的"],["strong","强壮的"],["weak","弱的"],
+["apple","苹果"],["banana","香蕉"],["orange","橙子"],["grape","葡萄"],["peach","桃子"],
+["pear","梨"],["tomato","西红柿"],["potato","土豆"],["carrot","胡萝卜"],["onion","洋葱"],
+["rice","米饭"],["bread","面包"],["noodle","面条"],["egg","鸡蛋"],["cake","蛋糕"],
+["meat","肉"],["chicken","鸡肉"],["fish","鱼"],["beef","牛肉"],["pork","猪肉"],
+["milk","牛奶"],["water","水"],["tea","茶"],["coffee","咖啡"],["juice","果汁"],
+["sugar","糖"],["salt","盐"],["butter","黄油"],["cheese","奶酪"],["sandwich","三明治"],
+["hamburger","汉堡"],["pizza","披萨"],["breakfast","早餐"],["lunch","午餐"],["dinner","晚餐"],
+["shirt","衬衫"],["T-shirt","T恤"],["blouse","女衬衫"],["jacket","夹克"],["coat","外套"],
+["sweater","毛衣"],["trousers","裤子"],["jeans","牛仔裤"],["shorts","短裤"],["skirt","裙子"],
+["dress","连衣裙"],["shoe","鞋子"],["boot","靴子"],["sock","袜子"],["scarf","围巾"],
+["glove","手套"],["hat","帽子"],["Chinese","语文"],["English","英语"],["maths","数学"],
+["science","科学"],["physics","物理"],["chemistry","化学"],["biology","生物"],["history","历史"],
+["geography","地理"],["music","音乐"],["art","美术"],["PE","体育"],["exam","考试"],
+["homework","作业"],["project","项目"],["knowledge","知识"],["hospital","医院"],["library","图书馆"],
+["museum","博物馆"],["cinema","电影院"],["theatre","剧院"],["restaurant","餐厅"],["supermarket","超市"],
+["park","公园"],["zoo","动物园"],["airport","机场"],["station","车站"],["bridge","桥"],
+["road","道路"],["street","街道"],["corner","拐角"],["building","大楼"],["garden","花园"],
+["kitchen","厨房"],["bedroom","卧室"],["bathroom","浴室"],["balcony","阳台"],["furniture","家具"],
+["car","汽车"],["bus","公交车"],["bike","自行车"],["train","火车"],["plane","飞机"],
+["ship","轮船"],["underground","地铁"],["taxi","出租车"],["boat","小船"],["traffic","交通"],
+["mountain","山"],["river","河流"],["lake","湖"],["forest","森林"],["island","岛屿"],
+["desert","沙漠"],["ocean","海洋"],["beach","海滩"],["field","田野"],["hill","小山"],
+["tree","树"],["flower","花"],["grass","草"],["leaf","叶子"],["plant","植物"],
+["animal","动物"],["weather","天气"],["rain","雨"],["snow","雪"],["wind","风"],
+["cloud","云"],["sun","太阳"],["storm","暴风雨"],["temperature","温度"],["season","季节"],
+["happy","开心的"],["sad","伤心的"],["angry","生气的"],["tired","累的"],["hungry","饿的"],
+["thirsty","渴的"],["excited","兴奋的"],["worried","担心的"],["surprised","惊讶的"],["scared","害怕的"],
+["proud","骄傲的"],["shy","害羞的"],["nervous","紧张的"],["lonely","孤独的"],["bored","无聊的"],
+["kind","善良的"],["polite","礼貌的"],["honest","诚实的"],["brave","勇敢的"],["patient","耐心的"],
+["careful","仔细的"],["generous","大方的"],["friendly","友好的"],["helpful","有帮助的"],["selfish","自私的"],
+["lazy","懒惰的"],["beautiful","美丽的"],["handsome","英俊的"],["ugly","丑陋的"],["lovely","可爱的"],
+["huge","巨大的"],["tiny","微小的"],["wide","宽的"],["narrow","窄的"],["deep","深的"],
+["shallow","浅的"],["thick","厚的"],["soft","软的"],["hard","硬的"],["heavy","重的"],
+["light","轻的"],["bright","明亮的"],["dark","黑暗的"],["rich","富有的"],["poor","贫穷的"],
+["famous","著名的"],["popular","受欢迎的"],["important","重要的"],["different","不同的"],["same","相同的"],
+["possible","可能的"],["necessary","必要的"],["wonderful","精彩的"],["terrible","糟糕的"],["excellent","优秀的"],
+["dangerous","危险的"],["safe","安全的"],["expensive","昂贵的"],["cheap","便宜的"],["modern","现代的"],
+["ancient","古代的"],["traditional","传统的"],["foreign","外国的"],["international","国际的"],["environment","环境"],
+["think","思考"],["believe","相信"],["remember","记住"],["forget","忘记"],["understand","理解"],
+["know","知道"],["learn","学习"],["teach","教"],["study","研究"],["read","读"],
+["write","写"],["speak","说"],["listen","听"],["look","看"],["see","看见"],
+["hear","听见"],["feel","感觉"],["touch","触摸"],["smell","闻"],["taste","尝"],
+["try","尝试"],["choose","选择"],["decide","决定"],["agree","同意"],["refuse","拒绝"],
+["explain","解释"],["describe","描述"],["introduce","介绍"],["suggest","建议"],["promise","承诺"],
+["communicate","交流"],["discuss","讨论"],["argue","争论"],["invite","邀请"],["accept","接受"],
+["offer","提供"],["provide","提供"],["protect","保护"],["support","支持"],["develop","发展"],
+["improve","提高"],["create","创造"],["produce","生产"],["discover","发现"],["invent","发明"],
+["success","成功"],["effort","努力"],["experience","经验"],["advantage","优势"],["purpose","目的"],
+["result","结果"],["reason","理由"],["chance","机会"],["problem","问题"],["solution","解决办法"],
+["method","方法"],["situation","情况"],["progress","进步"],["attention","注意力"],["courage","勇气"],
+["confidence","信心"],["responsibility","责任"],["relationship","关系"],["communication","交流"],["education","教育"],
+["technology","技术"],["internet","互联网"],["computer","电脑"],["mobile","手机"],["email","电子邮件"],
+["information","信息"],["message","消息"],["newspaper","报纸"],["magazine","杂志"],["programme","节目"],
+["advertisement","广告"],["already","已经"],["almost","几乎"],["exactly","确切地"],["especially","尤其"],
+["probably","可能"],["certainly","当然"],["suddenly","突然"],["finally","最终"],["immediately","立即"],
+["recently","最近"],["usually","通常"],["sometimes","有时"],["often","经常"],["always","总是"],
+["never","从不"],["however","然而"],["although","虽然"],["because","因为"],["therefore","因此"],
+["instead","代替"],["besides","此外"],["whether","是否"],["since","自从"],["while","当…时"],
+["during","在…期间"],["among","在…之中"],["between","在…之间"],["through","穿过"],["against","反对"],
+["towards","朝向"],["without","没有"],["within","在…之内"],["above","在…上方"],["below","在…下方"],
+["who","谁"],["which","哪个"],["whose","谁的"],["whom","谁(宾格)"],["wherever","无论哪里"],
+["everyone","每个人"],["nobody","没有人"],["something","某事"],["nothing","没什么"],["myself","我自己"]
+];
+
+var WLEN = WORDS.length;
+var PER_ROUND = 10;
+var DAILY = 20;
+var MAX_ROUNDS = 2;
+
+// ======= 记忆口诀 =======
+var TIPS = {
+  monday:"Mon(月亮) + day → 月亮日 = 星期一",
+  tuesday:"Tues(战神) + day → 战神日",
+  wednesday:"Wedn( Odin) + es + day → 奥丁日",
+  thursday:"Thurs(雷神) + day → 雷神日 = 星期四",
+  friday:"Fri(爱神) + day → 爱神日 = 星期五",
+  january:"Janu(门神) + ary → 门神之月 = 一月",
+  february:"Febru(净化) + ary → 净化之月",
+  september:"sept(七) + ember → 原来是第七个月",
+  october:"oct(八) + ober → 第八个月",
+  november:"nov(九) + ember → 第九个月",
+  december:"dec(十) + ember → 第十个月",
+  neighbour:"neigh(附近) + bour → 住在附近的人",
+  teenager:"teen(十几岁) + ager → 十几岁的人",
+  shoulder:"should(应该) + er → 应该扛在肩上的",
+  stomach:"stom(胃) + ach → 谐音「死肚子」",
+  sandwich:"sand(沙) + wich → 三明治伯爵发明的",
+  hamburger:"Hamburg(汉堡城) + er → 来自汉堡的食物",
+  trousers:"trous(裤子) + ers → 两条腿所以有s",
+  chemistry:"chemi(化学) + stry → 谐音「开密室」",
+  biology:"bio(生命) + logy(学科) → 研究生命的学科",
+  geography:"geo(地球) + graphy(描述) → 描述地球的学科",
+  knowledge:"know(知道) + ledge → 知道的东西",
+  hospital:"hospit(招待) + al → 招待病人的地方",
+  restaurant:"rest(休息) + aur + ant → 休息吃饭的地方",
+  supermarket:"super(超级) + market(市场) → 超级市场",
+  underground:"under(下面) + ground(地面) → 地面下的路",
+  mountain:"mount(山) + ain → 很大的山",
+  temperature:"temper(性情) + ature → 天气的「性情」",
+  environment:"environ(包围) + ment → 包围我们的东西",
+  beautiful:"beauti(美) + ful → 充满美的",
+  dangerous:"danger(危险) + ous → 充满危险的",
+  expensive:"ex(出) + pens(花) + ive → 花出去很多的",
+  important:"im + port(重要) + ant → 重要的",
+  different:"differ(不同) + ent → 不同的",
+  necessary:"neces(必要) + sary → 必要的",
+  excellent:"ex(超出) + cell + ent → 超出一般的",
+  remember:"re(再) + member(成员) → 再次想起 = 记住",
+  understand:"under(下面) + stand(站) → 站在下面支撑 = 理解",
+  introduce:"intro(进入) + duce(引导) → 引导进入 = 介绍",
+  communicate:"commu(共同) + nic(说) + ate → 共同说 = 交流",
+  communicate:"commu(共同) + nic(说) + ate → 共同说 = 交流",
+  protect:"pro(向前) + tect(盖) → 向前盖住 = 保护",
+  discover:"dis(去掉) + cover(盖) → 去掉盖子 = 发现",
+  technology:"techno(技术) + logy(学科) → 技术学",
+  internet:"inter(之间) + net(网) → 网之间的 = 互联网",
+  probably:"prob(可能) + ably → 可能地",
+  although:"al(全部) + though(虽然) → 虽然全部",
+  therefore:"there(那里) + fore(前面) → 前面说的所以",
+  responsibility:"response(回应) + ability(能力) → 回应的能力"
+};
+
+var CONFUSE = [
+  ["one","two","three","four","five","six","seven","eight","nine","ten","hundred","thousand"],
+  ["first","second","third"],
+  ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+  ["January","February","March","April","May","June","July","August","September","October","November","December"],
+  ["spring","summer","autumn","winter","season"],
+  ["morning","afternoon","evening","tonight","yesterday","tomorrow"],
+  ["hour","minute","early","late","week","month","year"],
+  ["parent","grandparent","husband","wife","uncle","aunt","cousin","neighbour","teenager","adult","family"],
+  ["head","eye","ear","nose","mouth","face","hair"],
+  ["hand","arm","leg","foot","finger","knee","shoulder","back","stomach","tooth"],
+  ["tall","short","fat","thin","strong","weak"],
+  ["apple","banana","orange","grape","peach","pear"],
+  ["tomato","potato","carrot","onion"],
+  ["rice","bread","noodle","egg","cake","sandwich","hamburger","pizza"],
+  ["meat","chicken","fish","beef","pork"],
+  ["milk","water","tea","coffee","juice"],
+  ["sugar","salt","butter","cheese"],
+  ["breakfast","lunch","dinner"],
+  ["shirt","T-shirt","blouse","jacket","coat","sweater"],
+  ["trousers","jeans","shorts","skirt","dress"],
+  ["shoe","boot","sock","scarf","glove","hat"],
+  ["Chinese","English","maths","science","physics","chemistry","biology","history","geography","music","art","PE"],
+  ["exam","homework","project","knowledge"],
+  ["hospital","library","museum","cinema","theatre","restaurant","supermarket"],
+  ["park","zoo","airport","station","bridge","road","street","corner","building","garden"],
+  ["kitchen","bedroom","bathroom","balcony","furniture"],
+  ["car","bus","bike","train","plane","ship","underground","taxi","boat","traffic"],
+  ["mountain","river","lake","forest","island","desert","ocean","beach","field","hill"],
+  ["tree","flower","grass","leaf","plant","animal"],
+  ["weather","rain","snow","wind","cloud","sun","storm","temperature"],
+  ["happy","sad","angry","tired","hungry","thirsty","excited","worried","surprised","scared"],
+  ["proud","shy","nervous","lonely","bored"],
+  ["kind","polite","honest","brave","patient","careful","generous","friendly","helpful","selfish","lazy"],
+  ["beautiful","handsome","ugly","lovely"],
+  ["huge","tiny","wide","narrow","deep","shallow","thick","soft","hard","heavy","light"],
+  ["bright","dark","rich","poor","famous","popular","important","different","same"],
+  ["possible","necessary","wonderful","terrible","excellent","dangerous","safe","expensive","cheap","modern","ancient","traditional","foreign","international"],
+  ["environment","technology","internet","computer","mobile","education"],
+  ["think","believe","remember","forget","understand","know","learn","teach","study"],
+  ["read","write","speak","listen","look","see","hear","feel","touch","smell","taste"],
+  ["try","choose","decide","agree","refuse","explain","describe","introduce","suggest","promise"],
+  ["communicate","discuss","argue","invite","accept","offer","provide","protect","support","develop","improve","create","produce","discover","invent"],
+  ["success","effort","experience","advantage","purpose","result","reason","chance","problem","solution","method","situation","progress","attention","courage","confidence","responsibility"],
+  ["relationship","communication","information","message","advertisement","programme"],
+  ["newspaper","magazine","email"],
+  ["already","almost","exactly","especially","probably","certainly","suddenly","finally","immediately","recently"],
+  ["usually","sometimes","often","always","never"],
+  ["however","although","because","therefore","instead","besides","whether","since","while","during"],
+  ["among","between","through","against","towards","without","within","above","below"],
+  ["everyone","nobody","something","nothing","myself","who","which","whose","whom","wherever"]
+];
+
+// ======= 音标 =======
+var PHON = {
+  one:"/wʌn/",two:"/tuː/",three:"/θriː/",four:"/fɔːr/",five:"/faɪv/",
+  six:"/sɪks/",seven:"/ˈsevən/",eight:"/eɪt/",nine:"/naɪn/",ten:"/ten/",
+  hundred:"/ˈhʌndrəd/",thousand:"/ˈθaʊzənd/",first:"/fɜːrst/",second:"/ˈsekənd/",third:"/θɜːrd/",
+  monday:"/ˈmʌndeɪ/",tuesday:"/ˈtjuːzdeɪ/",wednesday:"/ˈwenzdeɪ/",thursday:"/ˈθɜːrzdeɪ/",friday:"/ˈfraɪdeɪ/",
+  saturday:"/ˈsætərdeɪ/",sunday:"/ˈsʌndeɪ/",
+  january:"/ˈdʒænjueri/",february:"/ˈfebrueri/",march:"/mɑːrtʃ/",april:"/ˈeɪprəl/",may:"/meɪ/",june:"/dʒuːn/",
+  july:"/dʒuˈlaɪ/",august:"/ˈɔːɡəst/",september:"/sepˈtembər/",october:"/ɒkˈtoʊbər/",november:"/noʊˈvembər/",december:"/dɪˈsembər/",
+  spring:"/sprɪŋ/",summer:"/ˈsʌmər/",autumn:"/ˈɔːtəm/",winter:"/ˈwɪntər/",
+  morning:"/ˈmɔːrnɪŋ/",afternoon:"/ˌæftərˈnuːn/",evening:"/ˈiːvnɪŋ/",tonight:"/təˈnaɪt/",
+  yesterday:"/ˈjestərdeɪ/",tomorrow:"/təˈmɒroʊ/",week:"/wiːk/",month:"/mʌnθ/",year:"/jɪr/",
+  hour:"/aʊər/",minute:"/ˈmɪnɪt/",early:"/ˈɜːrli/",late:"/leɪt/",
+  parent:"/ˈperənt/",grandparent:"/ˈɡrænperənt/",husband:"/ˈhʌzbənd/",wife:"/waɪf/",
+  uncle:"/ˈʌŋkəl/",aunt:"/ænt/",cousin:"/ˈkʌzən/",neighbour:"/ˈneɪbər/",
+  teenager:"/ˈtiːneɪdʒər/",adult:"/ˈædʌlt/",family:"/ˈfæməli/",
+  head:"/hed/",eye:"/aɪ/",ear:"/ɪr/",nose:"/noʊz/",mouth:"/maʊθ/",
+  face:"/feɪs/",hair:"/her/",hand:"/hænd/",arm:"/ɑːrm/",leg:"/leɡ/",
+  foot:"/fʊt/",finger:"/ˈfɪŋɡər/",knee:"/niː/",shoulder:"/ˈʃoʊldər/",
+  back:"/bæk/",stomach:"/ˈstʌmək/",tooth:"/tuːθ/",
+  tall:"/tɔːl/",short:"/ʃɔːrt/",fat:"/fæt/",thin:"/θɪn/",strong:"/strɒŋ/",weak:"/wiːk/",
+  apple:"/ˈæpəl/",banana:"/bəˈnænə/",orange:"/ˈɒrɪndʒ/",grape:"/ɡreɪp/",peach:"/piːtʃ/",pear:"/per/",
+  tomato:"/təˈmeɪtoʊ/",potato:"/pəˈteɪtoʊ/",carrot:"/ˈkærət/",onion:"/ˈʌnjən/",
+  rice:"/raɪs/",bread:"/bred/",noodle:"/ˈnuːdəl/",egg:"/eɡ/",cake:"/keɪk/",
+  meat:"/miːt/",chicken:"/ˈtʃɪkɪn/",fish:"/fɪʃ/",beef:"/biːf/",pork:"/pɔːrk/",
+  milk:"/mɪlk/",water:"/ˈwɔːtər/",tea:"/tiː/",coffee:"/ˈkɒfi/",juice:"/dʒuːs/",
+  sugar:"/ˈʃʊɡər/",salt:"/sɔːlt/",butter:"/ˈbʌtər/",cheese:"/tʃiːz/",sandwich:"/ˈsænwɪtʃ/",
+  hamburger:"/ˈhæmbɜːrɡər/",pizza:"/ˈpiːtsə/",
+  breakfast:"/ˈbrekfəst/",lunch:"/lʌntʃ/",dinner:"/ˈdɪnər/",
+  shirt:"/ʃɜːrt/","t-shirt":"/ˈtiːʃɜːrt/",blouse:"/blaʊz/",jacket:"/ˈdʒækɪt/",coat:"/koʊt/",
+  sweater:"/ˈswetər/",trousers:"/ˈtraʊzərz/",jeans:"/dʒiːnz/",shorts:"/ʃɔːrts/",
+  skirt:"/skɜːrt/",dress:"/dres/",shoe:"/ʃuː/",boot:"/buːt/",sock:"/sɒk/",
+  scarf:"/skɑːrf/",glove:"/ɡlʌv/",hat:"/hæt/",
+  chinese:"/tʃaɪˈniːz/",english:"/ˈɪŋɡlɪʃ/",maths:"/mæθs/",science:"/ˈsaɪəns/",
+  physics:"/ˈfɪzɪks/",chemistry:"/ˈkemɪstri/",biology:"/baɪˈɒlədʒi/",
+  history:"/ˈhɪstəri/",geography:"/dʒiˈɒɡrəfi/",music:"/ˈmjuːzɪk/",art:"/ɑːrt/",pe:"/piː iː/",
+  exam:"/ɪɡˈzæm/",homework:"/ˈhoʊmwɜːrk/",project:"/ˈprɒdʒekt/",knowledge:"/ˈnɒlɪdʒ/",
+  hospital:"/ˈhɒspɪtəl/",library:"/ˈlaɪbreri/",museum:"/mjuˈziːəm/",
+  cinema:"/ˈsɪnəmə/",theatre:"/ˈθɪətər/",restaurant:"/ˈrestrɒnt/",
+  supermarket:"/ˈsuːpərmɑːrkɪt/",park:"/pɑːrk/",zoo:"/zuː/",airport:"/ˈerpɔːrt/",
+  station:"/ˈsteɪʃən/",bridge:"/brɪdʒ/",road:"/roʊd/",street:"/striːt/",
+  corner:"/ˈkɔːrnər/",building:"/ˈbɪldɪŋ/",garden:"/ˈɡɑːrdən/",
+  kitchen:"/ˈkɪtʃɪn/",bedroom:"/ˈbedruːm/",bathroom:"/ˈbæθruːm/",
+  balcony:"/ˈbælkəni/",furniture:"/ˈfɜːrnɪtʃər/",
+  car:"/kɑːr/",bus:"/bʌs/",bike:"/baɪk/",train:"/treɪn/",plane:"/pleɪn/",
+  ship:"/ʃɪp/",underground:"/ˈʌndərɡraʊnd/",taxi:"/ˈtæksi/",boat:"/boʊt/",traffic:"/ˈtræfɪk/",
+  mountain:"/ˈmaʊntən/",river:"/ˈrɪvər/",lake:"/leɪk/",forest:"/ˈfɒrɪst/",island:"/ˈaɪlənd/",
+  desert:"/ˈdezərt/",ocean:"/ˈoʊʃən/",beach:"/biːtʃ/",field:"/fiːld/",hill:"/hɪl/",
+  tree:"/triː/",flower:"/ˈflaʊər/",grass:"/ɡræs/",leaf:"/liːf/",plant:"/plænt/",animal:"/ˈænɪməl/",
+  weather:"/ˈweðər/",rain:"/reɪn/",snow:"/snoʊ/",wind:"/wɪnd/",cloud:"/klaʊd/",
+  sun:"/sʌn/",storm:"/stɔːrm/",temperature:"/ˈtemprətʃər/",season:"/ˈsiːzən/",
+  happy:"/ˈhæpi/",sad:"/sæd/",angry:"/ˈæŋɡri/",tired:"/taɪərd/",hungry:"/ˈhʌŋɡri/",
+  thirsty:"/ˈθɜːrsti/",excited:"/ɪkˈsaɪtɪd/",worried:"/ˈwʌrid/",surprised:"/sərˈpraɪzd/",
+  scared:"/skerd/",proud:"/praʊd/",shy:"/ʃaɪ/",nervous:"/ˈnɜːrvəs/",lonely:"/ˈloʊnli/",bored:"/bɔːrd/",
+  kind:"/kaɪnd/",polite:"/pəˈlaɪt/",honest:"/ˈɒnɪst/",brave:"/breɪv/",patient:"/ˈpeɪʃənt/",
+  careful:"/ˈkerfəl/",generous:"/ˈdʒenərəs/",friendly:"/ˈfrendli/",helpful:"/ˈhelpfəl/",
+  selfish:"/ˈselfɪʃ/",lazy:"/ˈleɪzi/",
+  beautiful:"/ˈbjuːtɪfəl/",handsome:"/ˈhænsəm/",ugly:"/ˈʌɡli/",lovely:"/ˈlʌvli/",
+  huge:"/hjuːdʒ/",tiny:"/ˈtaɪni/",wide:"/waɪd/",narrow:"/ˈnæroʊ/",deep:"/diːp/",
+  shallow:"/ˈʃæloʊ/",thick:"/θɪk/",soft:"/sɒft/",hard:"/hɑːrd/",heavy:"/ˈhevi/",
+  light:"/laɪt/",bright:"/braɪt/",dark:"/dɑːrk/",rich:"/rɪtʃ/",poor:"/pʊr/",
+  famous:"/ˈfeɪməs/",popular:"/ˈpɒpjələr/",important:"/ɪmˈpɔːrtənt/",different:"/ˈdɪfərənt/",same:"/seɪm/",
+  possible:"/ˈpɒsəbəl/",necessary:"/ˈnesəseri/",wonderful:"/ˈwʌndərfəl/",terrible:"/ˈterəbəl/",
+  excellent:"/ˈeksələnt/",dangerous:"/ˈdeɪndʒərəs/",safe:"/seɪf/",expensive:"/ɪkˈspensɪv/",
+  cheap:"/tʃiːp/",modern:"/ˈmɒdərn/",ancient:"/ˈeɪnʃənt/",traditional:"/trəˈdɪʃənəl/",
+  foreign:"/ˈfɒrən/",international:"/ˌɪntərˈnæʃənəl/",environment:"/ɪnˈvaɪrənmənt/",
+  think:"/θɪŋk/",believe:"/bɪˈliːv/",remember:"/rɪˈmembər/",forget:"/fərˈɡet/",
+  understand:"/ˌʌndərˈstænd/",know:"/noʊ/",learn:"/lɜːrn/",teach:"/tiːtʃ/",study:"/ˈstʌdi/",
+  read:"/riːd/",write:"/raɪt/",speak:"/spiːk/",listen:"/ˈlɪsən/",look:"/lʊk/",
+  see:"/siː/",hear:"/hɪr/",feel:"/fiːl/",touch:"/tʌtʃ/",smell:"/smel/",taste:"/teɪst/",
+  try:"/traɪ/",choose:"/tʃuːz/",decide:"/dɪˈsaɪd/",agree:"/əˈɡriː/",refuse:"/rɪˈfjuːz/",
+  explain:"/ɪkˈspleɪn/",describe:"/dɪˈskraɪb/",introduce:"/ˌɪntrəˈdjuːs/",
+  suggest:"/səˈdʒest/",promise:"/ˈprɒmɪs/",
+  communicate:"/kəˈmjuːnɪkeɪt/",discuss:"/dɪˈskʌs/",argue:"/ˈɑːrɡjuː/",
+  invite:"/ɪnˈvaɪt/",accept:"/əkˈsept/",offer:"/ˈɒfər/",provide:"/prəˈvaɪd/",
+  protect:"/prəˈtekt/",support:"/səˈpɔːrt/",develop:"/dɪˈveləp/",improve:"/ɪmˈpruːv/",
+  create:"/kriˈeɪt/",produce:"/prəˈdjuːs/",discover:"/dɪˈskʌvər/",invent:"/ɪnˈvent/",
+  success:"/səkˈses/",effort:"/ˈefərt/",experience:"/ɪkˈspɪəriəns/",advantage:"/ədˈvæntɪdʒ/",
+  purpose:"/ˈpɜːrpəs/",result:"/rɪˈzʌlt/",reason:"/ˈriːzən/",chance:"/tʃæns/",
+  problem:"/ˈprɒbləm/",solution:"/səˈluːʃən/",method:"/ˈmeθəd/",situation:"/ˌsɪtʃuˈeɪʃən/",
+  progress:"/ˈprɒɡres/",attention:"/əˈtenʃən/",courage:"/ˈkɜːrɪdʒ/",confidence:"/ˈkɒnfɪdəns/",
+  responsibility:"/rɪˌspɒnsəˈbɪləti/",relationship:"/rɪˈleɪʃənʃɪp/",
+  communication:"/kəˌmjuːnɪˈkeɪʃən/",education:"/ˌedʒuˈkeɪʃən/",
+  technology:"/tekˈnɒlədʒi/",internet:"/ˈɪntərnet/",computer:"/kəmˈpjuːtər/",
+  mobile:"/ˈmoʊbəl/",email:"/ˈiːmeɪl/",information:"/ˌɪnfərˈmeɪʃən/",
+  message:"/ˈmesɪdʒ/",newspaper:"/ˈnjuːzpeɪpər/",magazine:"/ˌmæɡəˈziːn/",
+  programme:"/ˈprəʊɡræm/",advertisement:"/ədˈvɜːrtɪsmənt/",
+  already:"/ɔːlˈredi/",almost:"/ˈɔːlmoʊst/",exactly:"/ɪɡˈzæktli/",especially:"/ɪˈspeʃəli/",
+  probably:"/ˈprɒbəbli/",certainly:"/ˈsɜːrtnli/",suddenly:"/ˈsʌdənli/",finally:"/ˈfaɪnəli/",
+  immediately:"/ɪˈmiːdiətli/",recently:"/ˈriːsəntli/",
+  usually:"/ˈjuːʒuəli/",sometimes:"/ˈsʌmtaɪmz/",often:"/ˈɒfən/",always:"/ˈɔːlweɪz/",never:"/ˈnevər/",
+  however:"/haʊˈevər/",although:"/ɔːlˈðoʊ/",because:"/bɪˈkɒz/",therefore:"/ˈðerfɔːr/",
+  instead:"/ɪnˈsted/",besides:"/bɪˈsaɪdz/",whether:"/ˈweðər/",since:"/sɪns/",while:"/waɪl/",
+  during:"/ˈdjʊərɪŋ/",among:"/əˈmʌŋ/",between:"/bɪˈtwiːn/",through:"/θruː/",
+  against:"/əˈɡenst/",towards:"/təˈwɔːrdz/",without:"/wɪˈðaʊt/",within:"/wɪˈðɪn/",
+  above:"/əˈbʌv/",below:"/bɪˈloʊ/",
+  who:"/huː/",which:"/wɪtʃ/",whose:"/huːz/",whom:"/huːm/",wherever:"/werˈevər/",
+  everyone:"/ˈevriwʌn/",nobody:"/ˈnoʊbədi/",something:"/ˈsʌmθɪŋ/",nothing:"/ˈnʌθɪŋ/",myself:"/maɪˈself/"
+};
+
+// ======= 发音 =======
+function say(text) {
+  try {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.8;
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+function sayCn(text) {
+  try {
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN'; u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  } catch(e) {}
+}
+
+// ======= 数据存储 =======
+var store = null;
+
+function today() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function loadStore() {
+  if (store) return store;
+  try {
+    var raw = localStorage.getItem('vocab_sh7');
+    if (raw) { store = JSON.parse(raw); return store; }
+  } catch(e) {}
+  store = { days: {}, wrong: {}, checked: [] };
+  return store;
+}
+
+function saveStore() {
+  try { localStorage.setItem('vocab_sh7', JSON.stringify(store)); } catch(e) {}
+}
+
+function getToday() {
+  var s = loadStore();
+  var t = today();
+  if (!s.days[t]) s.days[t] = { done: [], rounds: 0, wrongToday: 0 };
+  return s.days[t];
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function totalLearned() {
+  var s = loadStore();
+  var set = {};
+  for (var k in s.days) {
+    var arr = s.days[k].done || [];
+    for (var i = 0; i < arr.length; i++) set[arr[i]] = 1;
+  }
+  return Object.keys(set).length;
+}
+
+var page = 'home';
+var quiz = null;
+var roundDone = false;
+var calMonth = new Date().getMonth();
+var calYear = new Date().getFullYear();
+
+function render() {
+  var r = document.getElementById('root');
+  if (page === 'home') drawHome(r);
+  else if (page === 'quiz') drawQuiz(r);
+  else if (page === 'result') drawResult(r);
+  else if (page === 'review') drawReview(r);
+  else if (page === 'calendar') drawCalendar(r);
+}
+
+function drawHome(r) {
+  var s = loadStore(); var t = today(); var day = getToday();
+  var done = day.done.length; var rounds = day.rounds;
+  var remain = Math.max(0, DAILY - done);
+  var canGo = remain > 0 && rounds < MAX_ROUNDS;
+  var wc = Object.keys(s.wrong || {}).length;
+  var learned = totalLearned();
+  var pct = Math.round(learned / WLEN * 100);
+  var dotsHtml = '';
+  var now = new Date();
+  for (var i = 6; i >= 0; i--) {
+    var dt = new Date(now); dt.setDate(dt.getDate() - i);
+    var ds = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+    var dd = s.days[ds];
+    var ok = dd && dd.done && dd.done.length >= DAILY;
+    dotsHtml += '<span class="' + (ok?'ok ':'') + (i===0?'today':'') + '">' + (ok?'✓':dt.getDate()) + '</span>';
+  }
+  var wrongHtml = '';
+  if (wc > 0) {
+    wrongHtml = '<div class="wb" onclick="page=\'review\';render()">' +
+      '<div class="ico">📕</div><div class="info"><div class="title">错题本</div>' +
+      '<div class="desc">累计 <b>' + wc + '</b> 个错词 · 点击复习</div></div><div class="arr">›</div></div>';
+  }
+  r.innerHTML =
+    '<h1>上海初一英语每日练</h1>' +
+    '<div class="sub">' + t + ' · 牛津版 · ' + WLEN + '词</div>' +
+    '<div class="row">' +
+      '<div class="card"><div class="v grn">' + done + '</div><div class="lb">今日已学</div></div>' +
+      '<div class="card"><div class="v">' + rounds + '/' + MAX_ROUNDS + '</div><div class="lb">完成轮次</div></div>' +
+      '<div class="card"><div class="v">' + remain + '</div><div class="lb">今日剩余</div></div>' +
+      '<div class="card"><div class="v red">' + wc + '</div><div class="lb">累计错题</div></div>' +
+    '</div>' +
+    '<div class="pbar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="plabel">总进度 ' + learned + '/' + WLEN + ' (' + pct + '%)</div>' +
+    '<div class="dots">' + dotsHtml + '</div>' + wrongHtml +
+    '<button class="btn btn-main" ' + (canGo ? 'onclick="startQuiz()"' : 'disabled') + '>' +
+      (canGo ? '开始练习 (' + PER_ROUND + '题)' : '今日已完成 ✓') + '</button>' +
+    '<button class="btn btn-ghost" onclick="page=\'calendar\';render()">📅 打卡日历</button>';
+}
+
+function startQuiz() {
+  var s = loadStore(); var t = today(); var day = s.days[t];
+  var doneSet = {};
+  for (var i = 0; i < day.done.length; i++) doneSet[day.done[i]] = 1;
+  var pool = [];
+  for (var i = 0; i < WLEN; i++) { if (!doneSet[i]) pool.push(i); }
+  if (pool.length === 0) { page = 'home'; render(); return; }
+  var picked = shuffle(pool).slice(0, PER_ROUND);
+  var types = ['cn2en', 'en2cn', 'fill'];
+  var qs = [];
+  for (var i = 0; i < picked.length; i++) qs.push(makeQuestion(picked[i], types[i % 3]));
+  qs = shuffle(qs);
+  quiz = { qs: qs, qi: 0, score: 0, wrongs: [], answered: false, tried: {} };
+  roundDone = false; page = 'quiz'; render();
+  var fq = quiz.qs[0];
+  setTimeout(function() { if (fq.type === 'cn2en') sayCn(fq.cn); else say(fq.en); }, 200);
+}
+
+function makeQuestion(wi, type) {
+  var w = WORDS[wi]; var orig = w[0]; var en = orig.toLowerCase(); var cn = w[1];
+  if (type === 'fill') {
+    var cands = [];
+    for (var i = 0; i < en.length; i++) { if (/[a-z]/.test(en[i])) cands.push(i); }
+    var pos;
+    if (en.length >= 5) {
+      var mid = Math.floor(en.length / 2);
+      var near = cands.filter(function(x) { return Math.abs(x - mid) <= 2; });
+      pos = near.length > 0 ? near[Math.floor(Math.random() * near.length)] : cands[Math.floor(Math.random() * cands.length)];
+    } else { pos = cands[Math.floor(Math.random() * cands.length)]; }
+    return { type: 'fill', wi: wi, en: en, orig: orig, cn: cn, bpos: pos, ans: en[pos] };
+  }
+  var distractors = getDistractors(wi, 3);
+  if (type === 'en2cn') {
+    var opts = shuffle([{ t: cn, c: true }].concat(distractors.map(function(d) { return { t: WORDS[d][1], c: false }; })));
+    return { type: 'en2cn', wi: wi, en: en, orig: orig, cn: cn, opts: opts, ans: cn };
+  }
+  var opts = shuffle([{ t: en, c: true }].concat(distractors.map(function(d) { return { t: WORDS[d][0], c: false }; })));
+  return { type: 'cn2en', wi: wi, en: en, orig: orig, cn: cn, opts: opts, ans: en };
+}
+
+function getDistractors(wi, n) {
+  var target = WORDS[wi][0]; var result = []; var used = {}; used[wi] = 1;
+  for (var g = 0; g < CONFUSE.length; g++) {
+    var group = CONFUSE[g]; var inGroup = false;
+    for (var j = 0; j < group.length; j++) { if (group[j] === target) { inGroup = true; break; } }
+    if (inGroup) {
+      var indices = [];
+      for (var j = 0; j < group.length; j++) {
+        if (group[j] === target) continue;
+        for (var k = 0; k < WLEN; k++) {
+          if (!used[k] && WORDS[k][0] === group[j]) { indices.push(k); used[k] = 1; break; }
+        }
+      }
+      var picked = shuffle(indices);
+      for (var j = 0; j < picked.length && result.length < n; j++) result.push(picked[j]);
+      if (result.length >= n) return shuffle(result).slice(0, n);
+      break;
+    }
+  }
+  var cands = [];
+  for (var i = 0; i < WLEN; i++) {
+    if (used[i]) continue;
+    var diff = Math.abs(WORDS[i][0].length - target.length);
+    if (diff <= 3) cands.push({ i: i, d: diff });
+  }
+  cands.sort(function(a, b) { return a.d - b.d; });
+  for (var i = 0; i < cands.length && result.length < n; i++) result.push(cands[i].i);
+  return shuffle(result).slice(0, n);
+}
+
+function drawQuiz(r) {
+  if (!quiz) { page = 'home'; render(); return; }
+  if (quiz.qi >= quiz.qs.length) { roundDone = true; page = 'result'; render(); return; }
+  var q = quiz.qs[quiz.qi];
+  var pct = Math.round(quiz.qi / quiz.qs.length * 100);
+  var tname = { fill: '字母填空', en2cn: '英 → 中', cn2en: '中 → 英' }[q.type];
+  var body = '';
+  if (q.type === 'fill') {
+    var boxes = '';
+    for (var i = 0; i < q.en.length; i++) {
+      var cls = i === q.bpos ? 'bl' : '';
+      boxes += '<div id="lb' + i + '" class="' + cls + '">' + (i === q.bpos ? '?' : q.orig[i]) + '</div>';
+    }
+    var rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']; var kb = '';
+    for (var ri = 0; ri < rows.length; ri++) {
+      kb += '<div>';
+      for (var ci = 0; ci < rows[ri].length; ci++) {
+        var ch = rows[ri][ci];
+        kb += '<button class="' + (quiz.tried[ch]?'used':'') + '" onclick="fillKey(\'' + ch + '\')">' + ch + '</button>';
+      }
+      kb += '</div>';
+    }
+    var phonStr = PHON[q.en] ? '<div class="ipa">' + PHON[q.en] + '</div>' : '';
+    body = '<div class="qcenter"><div class="small">' + q.cn + '</div></div>' +
+      '<div style="text-align:center"><button class="speak" onclick="say(\'' + q.en + '\')">🔊 听发音</button>' + phonStr + '</div>' +
+      '<div class="lets" id="lets">' + boxes + '</div><div class="fb" id="fb">&nbsp;</div>' +
+      '<div class="kb">' + kb + '</div><div id="tipzone"></div>';
+  } else if (q.type === 'cn2en') {
+    var opts = '';
+    for (var i = 0; i < q.opts.length; i++) opts += '<button id="op' + i + '" onclick="pickOpt(' + i + ')">' + q.opts[i].t + '</button>';
+    body = '<div class="qcenter"><div class="big">' + q.cn + '</div><div class="small">选出正确的英文单词</div>' +
+      '<div style="margin-top:8px"><button class="speak" onclick="sayCn(\'' + q.cn + '\')">🔊 听中文</button> ' +
+      '<button class="speak" onclick="say(\'' + q.en + '\')">🔊 听英文</button></div></div>' +
+      '<div class="opts" id="opts">' + opts + '</div><div class="fb" id="fb">&nbsp;</div><div id="tipzone"></div>';
+  } else {
+    var phonStr = PHON[q.en] ? '<div class="ipa">' + PHON[q.en] + '</div>' : '';
+    var opts = '';
+    for (var i = 0; i < q.opts.length; i++) opts += '<button id="op' + i + '" onclick="pickOpt(' + i + ')">' + q.opts[i].t + '</button>';
+    body = '<div class="qcenter"><div class="big">' + q.orig + '</div><div class="small">选出正确的中文意思</div>' +
+      '<div style="text-align:center"><button class="speak" onclick="say(\'' + q.en + '\')">🔊 听发音</button>' + phonStr + '</div></div>' +
+      '<div class="opts" id="opts">' + opts + '</div><div class="fb" id="fb">&nbsp;</div><div id="tipzone"></div>';
+  }
+  r.innerHTML = '<div class="qhead"><span>第 <b>' + (quiz.qi+1) + '</b>/' + quiz.qs.length + ' 题</span><span>正确 <b>' + quiz.score + '</b></span></div>' +
+    '<div class="pmini"><i style="width:' + pct + '%"></i></div><div class="tag">' + tname + '</div>' + body;
+}
+
+function fillKey(ch) {
+  if (!quiz || quiz.answered) return;
+  var q = quiz.qs[quiz.qi]; quiz.answered = true; quiz.tried[ch] = 1;
+  var btns = document.querySelectorAll('.kb button');
+  for (var i = 0; i < btns.length; i++) { if (btns[i].textContent === ch) btns[i].classList.add('used'); }
+  var box = document.getElementById('lb' + q.bpos); var fb = document.getElementById('fb');
+  if (ch === q.ans) {
+    if (box) { box.textContent = q.orig[q.bpos]; box.className = 'ok'; }
+    fb.className = 'fb ok'; fb.textContent = '✓ 正确！'; quiz.score++; recCorrect(q.wi); say(q.en);
+  } else {
+    if (box) { box.textContent = q.orig[q.bpos]; box.className = 'no'; }
+    fb.className = 'fb no'; fb.textContent = '✗ 正确答案：' + q.orig[q.bpos] + ' → ' + q.orig;
+    quiz.wrongs.push({ en: q.en, cn: q.cn, wi: q.wi }); recWrong(q.wi);
+  }
+  showTip(q.wi, q.en, q.cn); setTimeout(nextQ, 1000);
+}
+
+function pickOpt(idx) {
+  if (!quiz || quiz.answered) return;
+  quiz.answered = true; var q = quiz.qs[quiz.qi]; var fb = document.getElementById('fb');
+  var btns = document.querySelectorAll('#opts button');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.add('off');
+    if (q.opts[i].c) btns[i].classList.add('ok');
+    if (i === idx && !q.opts[i].c) btns[i].classList.add('no');
+  }
+  if (q.opts[idx].c) {
+    fb.className = 'fb ok'; fb.textContent = '✓ 正确！'; quiz.score++; recCorrect(q.wi); say(q.en);
+  } else {
+    fb.className = 'fb no'; fb.textContent = '✗ 正确答案：' + q.ans;
+    quiz.wrongs.push({ en: q.en, cn: q.cn, wi: q.wi }); recWrong(q.wi);
+  }
+  showTip(q.wi, q.en, q.cn); setTimeout(nextQ, 1000);
+}
+
+function nextQ() {
+  quiz.qi++; quiz.answered = false; quiz.tried = {}; render();
+  if (page === 'quiz' && quiz.qs[quiz.qi]) {
+    var nq = quiz.qs[quiz.qi];
+    setTimeout(function() { if (nq.type === 'cn2en') sayCn(nq.cn); else say(nq.en); }, 150);
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (page !== 'quiz' || !quiz) return;
+  var q = quiz.qs[quiz.qi];
+  if (!q || q.type !== 'fill' || quiz.answered) return;
+  var ch = e.key.toLowerCase();
+  if (/^[a-z]$/.test(ch)) fillKey(ch);
+});
+
+function showTip(wi, en, cn) {
+  var s = loadStore(); var wc = (s.wrong || {})[wi] || 0;
+  if (wc < 3) return;
+  var zone = document.getElementById('tipzone'); if (!zone) return;
+  var tip = TIPS[en] || ('多读几遍：' + en + ' = ' + cn + '，大声念出来帮助记忆！');
+  zone.innerHTML = '<div class="tipbox"><div class="tt">💡 记忆口诀（已错' + wc + '次）</div>' +
+    '<div class="td">' + tip + '</div>' +
+    '<div style="margin-top:8px"><button class="speak" onclick="say(\'' + en + '\')">🔊 再听一遍</button></div></div>';
+  say(en);
+}
+
+function recCorrect(wi) { var s = loadStore(); var t = today(); if (s.days[t].done.indexOf(wi) === -1) s.days[t].done.push(wi); saveStore(); }
+function recWrong(wi) {
+  var s = loadStore(); var t = today();
+  if (s.days[t].done.indexOf(wi) === -1) s.days[t].done.push(wi);
+  s.days[t].wrongToday = (s.days[t].wrongToday || 0) + 1;
+  if (!s.wrong) s.wrong = {}; s.wrong[wi] = (s.wrong[wi] || 0) + 1; saveStore();
+}
+function sealRound() {
+  if (!roundDone) return; var s = loadStore(); var t = today();
+  s.days[t].rounds = (s.days[t].rounds || 0) + 1;
+  if (!s.checked) s.checked = [];
+  if (s.checked.indexOf(t) === -1 && s.days[t].done.length >= DAILY) s.checked.push(t);
+  saveStore(); roundDone = false;
+}
+
+function drawResult(r) {
+  if (!quiz) { page = 'home'; render(); return; }
+  var tot = quiz.qs.length; var pct = tot > 0 ? Math.round(quiz.score / tot * 100) : 0;
+  var msg = pct >= 90 ? '太棒了！' : pct >= 70 ? '不错！' : pct >= 50 ? '加油！' : '多复习错题吧';
+  var wl = '';
+  if (quiz.wrongs.length > 0) {
+    wl = '<div class="wlist"><div style="color:#ef4444;font-weight:600;margin-bottom:4px">本轮错题：</div>';
+    for (var i = 0; i < quiz.wrongs.length; i++) { var w = quiz.wrongs[i]; wl += '<div><b>' + w.en + '</b> <em>— ' + w.cn + '</em></div>'; }
+    wl += '</div>';
+  }
+  r.innerHTML = '<h1>本轮成绩</h1><div class="rcard"><h2>' + msg + '</h2>' +
+    '<div class="big">' + quiz.score + '<span> / ' + tot + '</span></div>' +
+    '<div class="det">正确率 ' + pct + '% · 错 ' + quiz.wrongs.length + ' 题</div>' + wl +
+    '<button onclick="goHome()">返回首页</button>' +
+    (quiz.wrongs.length > 0 ? '<button onclick="page=\'review\';render()">查看错题本</button>' : '') + '</div>';
+}
+
+function goHome() { sealRound(); page = 'home'; render(); }
+
+function drawReview(r) {
+  var s = loadStore(); var wr = s.wrong || {}; var keys = Object.keys(wr).map(Number);
+  var list = '';
+  if (keys.length === 0) { list = '<div class="empty">没有错题，继续保持！</div>'; }
+  else {
+    keys.sort(function(a, b) { return wr[b] - wr[a]; });
+    list = '<div class="revlist">';
+    for (var i = 0; i < keys.length; i++) { var wi = keys[i]; var w = WORDS[wi];
+      list += '<div><span class="en">' + w[0] + '</span><span class="cn">' + w[1] + '</span><span class="x">错' + wr[wi] + '次</span></div>'; }
+    list += '</div>';
+  }
+  r.innerHTML = '<h1>📕 错题本</h1><div class="sub">共 ' + keys.length + ' 个错词</div>' + list +
+    '<div class="revbtns"><button class="back" onclick="goHome()">返回</button>' +
+    (keys.length > 0 ? '<button onclick="practiceWrong()">练习错题</button>' : '') +
+    (keys.length > 0 ? '<button onclick="clearWrong()">清空</button>' : '') + '</div>';
+}
+
+function clearWrong() { if (!confirm('确定清空所有错题？')) return; var s = loadStore(); s.wrong = {}; saveStore(); render(); }
+
+function practiceWrong() {
+  var s = loadStore(); var keys = Object.keys(s.wrong || {}).map(Number);
+  if (keys.length === 0) return;
+  var picked = shuffle(keys).slice(0, Math.min(PER_ROUND, keys.length));
+  var types = ['cn2en', 'en2cn', 'fill']; var qs = [];
+  for (var i = 0; i < picked.length; i++) qs.push(makeQuestion(picked[i], types[i % 3]));
+  quiz = { qs: shuffle(qs), qi: 0, score: 0, wrongs: [], answered: false, tried: {} };
+  roundDone = false; page = 'quiz'; render();
+}
+
+function drawCalendar(r) {
+  var s = loadStore(); var y = calYear; var m = calMonth;
+  var firstDay = new Date(y, m, 1).getDay(); var daysInMonth = new Date(y, m + 1, 0).getDate(); var todayStr = today();
+  var navHtml = '<div class="calmonth"><button onclick="changeMonth(-1)">‹</button>' +
+    '<span class="mlabel">' + y + '年' + (m + 1) + '月</span><button onclick="changeMonth(1)">›</button></div>';
+  var grid = ''; var headers = ['日','一','二','三','四','五','六'];
+  for (var i = 0; i < 7; i++) grid += '<div class="h">' + headers[i] + '</div>';
+  for (var i = 0; i < firstDay; i++) grid += '<div></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    var dd = s.days[ds]; var doneN = dd && dd.done ? dd.done.length : 0;
+    var ok = doneN >= DAILY; var isChecked = s.checked && s.checked.indexOf(ds) !== -1; var isNow = (ds === todayStr);
+    var wrongN = 0;
+    if (dd && dd.done) { for (var wi = 0; wi < dd.done.length; wi++) { if (s.wrong && s.wrong[dd.done[wi]]) wrongN++; } }
+    var correctN = doneN - wrongN;
+    var cls = ''; if (ok) cls += 'done '; else if (doneN > 0) cls += 'part '; if (isNow) cls += 'today-cell '; if (doneN > 0) cls += 'click ';
+    var cellContent = '';
+    if (doneN > 0) {
+      cellContent = '<div class="caltip">已学 ' + doneN + '/' + DAILY + ' 词<br>' +
+        '<span style="color:#22c55e">✓ 正确 ' + correctN + '</span><br>' +
+        '<span style="color:#ef4444">✗ 错误 ' + wrongN + '</span>' +
+        (isChecked ? '<br><span style="color:#fbbf24">已打卡 ✓</span>' : '<br><span style="color:#9ca3af">点击可打卡</span>') + '</div>';
+    }
+    var displayNum = isChecked ? '✓' : d;
+    grid += '<div class="calcell"><div class="' + cls.trim() + '" onclick="pickDate(\'' + ds + '\',' + doneN + ',' + isChecked + ')">' + displayNum + '</div>' + cellContent + '</div>';
+  }
+  var totalChecked = (s.checked || []).length;
+  r.innerHTML = '<h1>📅 打卡日历</h1>' + navHtml +
+    '<div class="sub">累计打卡 ' + totalChecked + ' 天 · 悬浮查看详情 · 点击打卡</div>' +
+    '<div class="calgrid">' + grid + '</div>' +
+    '<div class="revbtns"><button class="back" onclick="goHome()">返回</button></div>';
+}
+
+function pickDate(ds, doneN, isChecked) {
+  if (doneN <= 0) return;
+  if (isChecked) { alert(ds + ' 已打卡！'); return; }
+  if (doneN < DAILY) { alert(ds + ' 学了 ' + doneN + ' 个词，还不够 ' + DAILY + ' 个，不能打卡哦'); return; }
+  if (!confirm(ds + '：已学 ' + doneN + ' 词，确认打卡？')) return;
+  var s = loadStore(); if (!s.checked) s.checked = [];
+  if (s.checked.indexOf(ds) === -1) s.checked.push(ds); saveStore(); render();
+}
+
+function changeMonth(dir) {
+  calMonth += dir; if (calMonth < 0) { calMonth = 11; calYear--; } if (calMonth > 11) { calMonth = 0; calYear++; } render();
+}
+
+render();
+</script>
+</body>
+</html>
