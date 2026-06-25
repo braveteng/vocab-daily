@@ -109,6 +109,26 @@ h1{text-align:center;color:#fbbf24;font-size:20px;letter-spacing:4px;margin-bott
 .calmonth .mlabel{font-size:15px;font-weight:600;color:#fbbf24;min-width:100px;text-align:center}
 .calgrid div.part{background:#4a3800;color:#fbbf24}
 .calgrid div.today-cell{border:2px solid #fbbf24}
+.dict-wrap{margin-top:8px}
+.dict-prompt{text-align:center;padding:12px 0 6px}
+.dict-prompt .cn{font-size:30px;font-weight:700;color:#fff}
+.dict-prompt .phon{font-size:14px;color:#a78bfa;margin-top:4px;font-family:Consolas,'Lucida Sans Unicode',sans-serif}
+.dict-canvas-wrap{position:relative;margin:10px 0;border-radius:10px;overflow:hidden;border:2px solid #374151;background:#0d1117}
+.dict-canvas-wrap canvas{display:block;width:100%;height:180px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.dict-hint{text-align:center;font-size:11px;color:#4b5563;margin-top:4px}
+.dict-btns{display:flex;gap:8px;margin:10px 0;justify-content:center}
+.dict-btns button{flex:1;padding:10px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#d1d5db;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.dict-btns button:active{transform:scale(.96)}
+.dict-btns .reveal{background:#fbbf24;color:#111;border-color:#fbbf24}
+.dict-btns .reveal:hover{background:#f59e0b}
+.dict-answer{text-align:center;padding:14px;margin:10px 0;background:#14532d;border:1px solid #22c55e;border-radius:10px}
+.dict-answer .word{font-size:30px;font-weight:700;color:#22c55e;letter-spacing:2px}
+.dict-answer .meaning{font-size:12px;color:#9ca3af;margin-top:4px}
+.dict-judge{display:flex;gap:10px;margin:12px 0}
+.dict-judge button{flex:1;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.dict-judge button:active{transform:scale(.96)}
+.dict-judge .y{background:#22c55e;color:#fff}
+.dict-judge .n{background:#ef4444;color:#fff}
 </style>
 </head>
 <body>
@@ -554,6 +574,8 @@ function render() {
   else if (page === 'result') drawResult(r);
   else if (page === 'review') drawReview(r);
   else if (page === 'calendar') drawCalendar(r);
+  else if (page === 'dictation') drawDictation(r);
+  else if (page === 'dictResult') drawDictResult(r);
 }
 
 function drawHome(r) {
@@ -563,6 +585,10 @@ function drawHome(r) {
   var canGo = remain > 0 && rounds < MAX_ROUNDS;
   var wc = Object.keys(s.wrong || {}).length;
   var learned = totalLearned();
+  var dictSet = {};
+  for (var di = 0; di < day.done.length; di++) dictSet[day.done[di]] = 1;
+  for (var k in s.wrong) dictSet[k] = 1;
+  var dictCount = Object.keys(dictSet).length;
   var pct = Math.round(learned / WLEN * 100);
   var dotsHtml = '';
   var now = new Date();
@@ -593,6 +619,8 @@ function drawHome(r) {
     '<div class="dots">' + dotsHtml + '</div>' + wrongHtml +
     '<button class="btn btn-main" ' + (canGo ? 'onclick="startQuiz()"' : 'disabled') + '>' +
       (canGo ? '开始练习 (' + PER_ROUND + '题)' : '今日已完成 ✓') + '</button>' +
+    '<button class="btn btn-main" style="background:#8b5cf6" ' + (dictCount > 0 ? 'onclick="startDictation()"' : 'disabled') + '>' +
+      (dictCount > 0 ? '📝 默写练习 (' + dictCount + ' 词)' : '📝 默写练习 (暂无单词)') + '</button>' +
     '<button class="btn btn-ghost" onclick="page=\'calendar\';render()">📅 打卡日历</button>';
 }
 
@@ -835,6 +863,179 @@ function practiceWrong() {
   for (var i = 0; i < picked.length; i++) qs.push(makeQuestion(picked[i], types[i % 3]));
   quiz = { qs: shuffle(qs), qi: 0, score: 0, wrongs: [], answered: false, tried: {} };
   roundDone = false; page = 'quiz'; render();
+}
+
+// ======= 默写模式 =======
+var dictPool = [];
+var dictIdx = 0;
+var dictCorrect = 0;
+var dictWrongs = [];
+var dictRevealed = false;
+var dictEn = '';
+var dictCn = '';
+
+function startDictation() {
+  var s = loadStore(); var t = today(); var day = getToday();
+  var poolSet = {};
+  for (var i = 0; i < day.done.length; i++) poolSet[day.done[i]] = 1;
+  for (var k in s.wrong) poolSet[Number(k)] = 1;
+  var pool = Object.keys(poolSet).map(Number);
+  if (pool.length === 0) return;
+  dictPool = shuffle(pool);
+  dictIdx = 0; dictCorrect = 0; dictWrongs = [];
+  page = 'dictation'; render();
+}
+
+function drawDictation(r) {
+  if (!dictPool || dictPool.length === 0) { page = 'home'; render(); return; }
+  if (dictIdx >= dictPool.length) { page = 'dictResult'; render(); return; }
+  var wi = dictPool[dictIdx];
+  var w = WORDS[wi];
+  dictEn = w[0].toLowerCase();
+  dictCn = w[1];
+  var phonStr = PHON[dictEn] ? '<div class="phon">' + PHON[dictEn] + '</div>' : '';
+  var pct = Math.round(dictIdx / dictPool.length * 100);
+  var actionHtml = '';
+  if (!dictRevealed) {
+    actionHtml = '<div class="dict-btns">' +
+      '<button onclick="dictClearCanvas()">🧹 清除</button>' +
+      '<button class="reveal" onclick="dictReveal()">👀 揭晓答案</button></div>';
+  } else {
+    actionHtml = '<div class="dict-answer"><div class="word">' + w[0] + '</div>' +
+      '<div class="meaning">' + w[1] + '</div></div>' +
+      '<div class="dict-judge">' +
+      '<button class="y" onclick="dictNext(true)">✓ 写对了</button>' +
+      '<button class="n" onclick="dictNext(false)">✗ 写错了</button></div>';
+    var tip = TIPS[dictEn];
+    var wc = (loadStore().wrong || {})[wi] || 0;
+    if (tip && wc >= 3) {
+      actionHtml += '<div class="tipbox"><div class="tt">💡 记忆口诀（已错' + wc + '次）</div>' +
+        '<div class="td">' + tip + '</div></div>';
+    }
+  }
+  r.innerHTML = '<div class="qhead"><span>默写 <b>' + (dictIdx + 1) + '</b> / ' + dictPool.length + '</span>' +
+    '<span>✓ <b>' + dictCorrect + '</b></span></div>' +
+    '<div class="pmini"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="dict-wrap">' +
+    '<div class="dict-prompt"><div class="cn">' + w[1] + '</div>' + phonStr +
+    '<div style="margin-top:6px"><button class="speak" onclick="say(dictEn)">🔊 听发音</button></div></div>' +
+    '<div class="dict-canvas-wrap"><canvas id="dictCanvas"></canvas></div>' +
+    '<div class="dict-hint">用 Apple Pencil 或手指在上面书写英文单词</div>' +
+    actionHtml + '</div>';
+  setTimeout(initDictCanvas, 50);
+}
+
+function initDictCanvas() {
+  var canvas = document.getElementById('dictCanvas');
+  if (!canvas) return;
+  var wrap = canvas.parentElement;
+  var w = wrap.clientWidth;
+  var h = 180;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  canvas._w = w; canvas._h = h;
+  dictDrawGrid(ctx, w, h);
+  var drawing = false;
+  var lastX = 0, lastY = 0;
+  canvas.addEventListener('pointerdown', function(e) {
+    e.preventDefault();
+    drawing = true;
+    var rect = canvas.getBoundingClientRect();
+    lastX = (e.clientX - rect.left) * (w / rect.width);
+    lastY = (e.clientY - rect.top) * (h / rect.height);
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', function(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var x = (e.clientX - rect.left) * (w / rect.width);
+    var y = (e.clientY - rect.top) * (h / rect.height);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    var mx = (lastX + x) / 2, my = (lastY + y) / 2;
+    ctx.quadraticCurveTo(lastX, lastY, mx, my);
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    lastX = x; lastY = y;
+  });
+  canvas.addEventListener('pointerup', function(e) { drawing = false; });
+  canvas.addEventListener('pointercancel', function(e) { drawing = false; });
+}
+
+function dictDrawGrid(ctx, w, h) {
+  var gap = 30;
+  var baseY = Math.floor(h * 0.65);
+  var ys = [baseY - gap * 2, baseY - gap, baseY, baseY + gap];
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  for (var i = 0; i < ys.length; i++) {
+    ctx.beginPath();
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(12, ys[i]);
+    ctx.lineTo(w - 12, ys[i]);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+function dictClearCanvas() {
+  var canvas = document.getElementById('dictCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var w = canvas._w, h = canvas._h;
+  var dpr = window.devicePixelRatio || 1;
+  ctx.clearRect(0, 0, w * dpr, h * dpr);
+  dictDrawGrid(ctx, w, h);
+}
+
+function dictReveal() {
+  dictRevealed = true;
+  render();
+  say(dictEn);
+}
+
+function dictNext(correct) {
+  var wi = dictPool[dictIdx];
+  if (correct) {
+    dictCorrect++;
+    recCorrect(wi);
+  } else {
+    dictWrongs.push({ en: WORDS[wi][0], cn: WORDS[wi][1], wi: wi });
+    recWrong(wi);
+  }
+  dictRevealed = false;
+  dictIdx++;
+  render();
+}
+
+function drawDictResult(r) {
+  if (!dictPool || dictPool.length === 0) { page = 'home'; render(); return; }
+  var tot = dictPool.length;
+  var pct = tot > 0 ? Math.round(dictCorrect / tot * 100) : 0;
+  var msg = pct >= 90 ? '太棒了！' : pct >= 70 ? '不错！' : pct >= 50 ? '加油！' : '多复习错题吧';
+  var wl = '';
+  if (dictWrongs.length > 0) {
+    wl = '<div class="wlist"><div style="color:#ef4444;font-weight:600;margin-bottom:4px">默写错误：</div>';
+    for (var i = 0; i < dictWrongs.length; i++) {
+      var ww = dictWrongs[i];
+      wl += '<div><b>' + ww.en + '</b> <em>— ' + ww.cn + '</em></div>';
+    }
+    wl += '</div>';
+  }
+  r.innerHTML = '<h1>默写成绩</h1><div class="rcard"><h2>' + msg + '</h2>' +
+    '<div class="big">' + dictCorrect + '<span> / ' + tot + '</span></div>' +
+    '<div class="det">正确率 ' + pct + '% · 错 ' + dictWrongs.length + ' 个</div>' + wl +
+    '<button onclick="startDictation()">再练一遍</button>' +
+    '<button onclick="goHome()">返回首页</button></div>';
 }
 
 function drawCalendar(r) {
