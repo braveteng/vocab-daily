@@ -111,19 +111,19 @@ h1{text-align:center;color:#fbbf24;font-size:20px;letter-spacing:4px;margin-bott
 .calgrid div.today-cell{border:2px solid #fbbf24}
 .dict-wrap{margin-top:8px}
 .dict-prompt{text-align:center;padding:12px 0 6px}
-.dict-prompt .cn{font-size:30px;font-weight:700;color:#fff}
-.dict-prompt .phon{font-size:14px;color:#a78bfa;margin-top:4px;font-family:Consolas,'Lucida Sans Unicode',sans-serif}
-.dict-canvas-wrap{position:relative;margin:10px 0;border-radius:10px;overflow:hidden;border:2px solid #374151;background:#0d1117}
-.dict-canvas-wrap canvas{display:block;width:100%;height:180px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-.dict-hint{text-align:center;font-size:11px;color:#4b5563;margin-top:4px}
+.dict-prompt .cn{font-size:34px;font-weight:700;color:#fff}
+.dict-prompt .phon{font-size:15px;color:#c4b5fd;margin-top:4px;font-family:Consolas,'Lucida Sans Unicode',sans-serif}
+.dict-canvas-wrap{position:relative;margin:10px 0;border-radius:10px;overflow:hidden;border:2px solid #374151;background:#1a1f2e}
+.dict-canvas-wrap canvas{display:block;width:100%;height:200px;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.dict-hint{text-align:center;font-size:12px;color:#9ca3af;margin-top:4px}
 .dict-btns{display:flex;gap:8px;margin:10px 0;justify-content:center}
 .dict-btns button{flex:1;padding:10px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#d1d5db;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
 .dict-btns button:active{transform:scale(.96)}
 .dict-btns .reveal{background:#fbbf24;color:#111;border-color:#fbbf24}
 .dict-btns .reveal:hover{background:#f59e0b}
 .dict-answer{text-align:center;padding:14px;margin:10px 0;background:#14532d;border:1px solid #22c55e;border-radius:10px}
-.dict-answer .word{font-size:30px;font-weight:700;color:#22c55e;letter-spacing:2px}
-.dict-answer .meaning{font-size:12px;color:#9ca3af;margin-top:4px}
+.dict-answer .word{font-size:34px;font-weight:700;color:#4ade80;letter-spacing:3px}
+.dict-answer .meaning{font-size:13px;color:#d1d5db;margin-top:4px}
 .dict-judge{display:flex;gap:10px;margin:12px 0}
 .dict-judge button{flex:1;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
 .dict-judge button:active{transform:scale(.96)}
@@ -930,7 +930,7 @@ function initDictCanvas() {
   if (!canvas) return;
   var wrap = canvas.parentElement;
   var w = wrap.clientWidth;
-  var h = 180;
+  var h = 200;
   var dpr = window.devicePixelRatio || 1;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
@@ -972,16 +972,17 @@ function initDictCanvas() {
 }
 
 function dictDrawGrid(ctx, w, h) {
-  var gap = 30;
-  var baseY = Math.floor(h * 0.65);
+  var gap = 32;
+  var baseY = Math.floor(h * 0.62);
   var ys = [baseY - gap * 2, baseY - gap, baseY, baseY + gap];
-  ctx.strokeStyle = '#1e293b';
-  ctx.lineWidth = 1;
+  var colors = ['#3b5998', '#334b70', '#334b70', '#3b5998'];
   for (var i = 0; i < ys.length; i++) {
     ctx.beginPath();
-    ctx.setLineDash([4, 4]);
-    ctx.moveTo(12, ys[i]);
-    ctx.lineTo(w - 12, ys[i]);
+    ctx.setLineDash(i === 0 || i === 3 ? [] : [6, 4]);
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = (i === 0 || i === 3) ? 1.5 : 1;
+    ctx.moveTo(10, ys[i]);
+    ctx.lineTo(w - 10, ys[i]);
     ctx.stroke();
   }
   ctx.setLineDash([]);
