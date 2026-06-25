@@ -410,23 +410,88 @@ var PHON = {
 };
 
 // ======= 发音 =======
-function say(text) {
-  try {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US'; u.rate = 0.8;
-    window.speechSynthesis.speak(u);
-  } catch(e) {}
+// ======= TTS 语音引擎（兼容 iPad Safari / Chrome / Edge） =======
+var ttsVoices = [];
+var ttsReady = false;
+var ttsWarmedUp = false;
+var ttsResumeTimer = null;
+
+// 预加载语音列表
+function ttsLoadVoices() {
+  ttsVoices = window.speechSynthesis.getVoices();
+  if (ttsVoices.length > 0) ttsReady = true;
+}
+ttsLoadVoices();
+if (typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
+  window.speechSynthesis.onvoiceschanged = ttsLoadVoices;
 }
 
-function sayCn(text) {
+// 找到匹配语言的语音
+function ttsFindVoice(lang) {
+  if (!ttsVoices.length) return null;
+  var prefix = lang.split('-')[0];
+  for (var i = 0; i < ttsVoices.length; i++) {
+    if (ttsVoices[i].lang.indexOf(lang) === 0) return ttsVoices[i];
+  }
+  for (var i = 0; i < ttsVoices.length; i++) {
+    if (ttsVoices[i].lang.indexOf(prefix) === 0) return ttsVoices[i];
+  }
+  return null;
+}
+
+// iOS Safari 首次手势唤醒（只需执行一次）
+function ttsWarmUp() {
+  if (ttsWarmedUp) return;
+  ttsWarmedUp = true;
   try {
-    window.speechSynthesis.cancel();
-    var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'zh-CN'; u.rate = 0.9;
+    var u = new SpeechSynthesisUtterance('');
+    u.volume = 0;
     window.speechSynthesis.speak(u);
   } catch(e) {}
 }
+document.addEventListener('click', ttsWarmUp);
+document.addEventListener('touchstart', ttsWarmUp);
+
+// Chrome 防暂停 bug：每 10 秒 pause/resume 一次
+function ttsStartResumeTimer() {
+  ttsStopResumeTimer();
+  ttsResumeTimer = setInterval(function() {
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 10000);
+}
+function ttsStopResumeTimer() {
+  if (ttsResumeTimer) { clearInterval(ttsResumeTimer); ttsResumeTimer = null; }
+}
+
+// 通用播放函数（带重试）
+function ttsSpeak(text, lang, rate) {
+  try {
+    window.speechSynthesis.cancel();
+    ttsStopResumeTimer();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = rate;
+    var v = ttsFindVoice(lang);
+    if (v) u.voice = v;
+    u.onstart = function() { ttsStartResumeTimer(); };
+    u.onend = function() { ttsStopResumeTimer(); };
+    u.onerror = function() { ttsStopResumeTimer(); };
+    window.speechSynthesis.speak(u);
+    // iOS Safari 有时不触发 onstart，延迟重试一次
+    setTimeout(function() {
+      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+        window.speechSynthesis.speak(u);
+        ttsStartResumeTimer();
+      }
+    }, 300);
+  } catch(e) { ttsStopResumeTimer(); }
+}
+
+function say(text) { ttsSpeak(text, 'en-US', 0.8); }
+function sayCn(text) { ttsSpeak(text, 'zh-CN', 0.9); }
 
 // ======= 数据存储 =======
 var store = null;
